@@ -26,7 +26,7 @@ var citesupport = new function () {
             console.log('*** '+txt);
         }
     }
-    
+
     /*
      * Insert handler
      */
@@ -88,7 +88,7 @@ var citesupport = new function () {
         if (config.current.citationID) {
             domRemoveCitation(config.current.citationID);
         }
-        
+
         // Remove citation from citationByIndex, posToCitationId, and citationIdToPos
         // Adjust note numbers in citationByIndex child properties if note style
         removePos = removeIdFromDataSets(config.mode, config.current.citationID);
@@ -257,10 +257,10 @@ var citesupport = new function () {
     /*
      * DOM methods
      */
-    
+
     function domSetCitations(mode, citeTuples, addOrEdit) {
         debug('domSetCitations()');
-        // 
+        //
         for (var i=0,ilen=citeTuples.length;i<ilen;i++) {
             if (addOrEdit && !config.current.citationID) {
                 var citationID = citeTuples[i][2];
