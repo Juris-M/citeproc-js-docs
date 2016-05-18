@@ -1,5 +1,4 @@
-import citeSupport from './citesupport';
-import store from './demo-store';
+import runner from './demo-store';
 
 
 class App {
@@ -7,7 +6,7 @@ class App {
     public citerunner: any;
 
     constructor() {
-        this.citerunner = citeSupport(store);
+        this.citerunner = runner;
         this.buildStyleMenu();
         this.spoofDocument();
         this.citerunner.initDocument();

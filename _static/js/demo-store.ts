@@ -1,5 +1,8 @@
+import CiteSupport from './citesupport';
 
-export default class SafeStorage {
+class SafeStorage {
+
+    public config: any;
 
     constructor(config) {
         this.config = config;
@@ -62,3 +65,5 @@ export default class SafeStorage {
     }
 
 }
+
+export default CiteSupport(SafeStorage);

@@ -48,10 +48,27 @@
  *
  * - Probably some other stuff that I've overlooked.
  */
+
+
+interface Config {
+    debug: boolean;
+    mode: 'note'|'in-text';
+    defaultLocale: string;
+    defaultStyle: string;
+    citationIDs: Object;
+    citationByIndex: any[];
+    processorReady: boolean;
+    demo: boolean;
+}
+
+
+
+
+
 const citeSupport = (Store) => {
     class Supporter {
 
-        public config: any;
+        public config: Config;
         public store: any;
         public worker: Worker;
 
@@ -116,7 +133,7 @@ const citeSupport = (Store) => {
                     this.debug('registerCitation()');
                     this.config.citationByIndex = e.data.citationByIndex;
                     // setCitations() implicitly updates this.config.citationIDs
-                    this.setCitations(this.config.mode, e.data.citationData, true);
+                    this.setCitations(this.config.mode, e.data.citationData);
                     this.setBibliography(e.data.bibliographyData);
                     this.store.citationByIndex = this.config.citationByIndex;
                     this.config.processorReady = true;
@@ -133,7 +150,7 @@ const citeSupport = (Store) => {
          * @param  {string} txt The message to log
          * @return {void}
          */
-        debug(txt) {
+        debug(txt: string) {
             if (this.config.debug) {
                 console.log(`*** ${txt}`);
             }
@@ -148,7 +165,7 @@ const citeSupport = (Store) => {
          * @param {Object[]} citationByIndex An array of citation objects with citationIDs
          * @return {void}
          */
-        callInitProcessor(styleName, localeName, citationByIndex) {
+        callInitProcessor(styleName: string, localeName: string, citationByIndex: Object[]) {
             this.debug('callInitProcessor()');
             this.config.processorReady = false;
             this.worker.postMessage({
@@ -164,13 +181,13 @@ const citeSupport = (Store) => {
          *   citations described by `preCitations` and precede those
          *   described in `postCitations`.
          *
-         * @param {Object{}} citation A citation object
+         * @param {Object} citation A citation object
          * @param {Object[]} preCitations Array of `[citationID, noteNumber]` pairs in document order
          * @param {Object[]} postCitations Array of `[citationID, noteNumber]`
          *   pairs in document order
          * @return {void}
          */
-        callRegisterCitation(citation, preCitations, postCitations) {
+        callRegisterCitation(citation: Object, preCitations: Object[], postCitations: Object[]) {
             if (!this.config.processorReady) return;
             this.debug('callRegisterCitation()');
             this.config.processorReady = false;
@@ -196,11 +213,11 @@ const citeSupport = (Store) => {
          *   of citations into a document
          * @return {Object[]}
          */
-        convertRebuildDataToCitationData(rebuildData) {
+        convertRebuildDataToCitationData(rebuildData: Object[]) {
             if (!rebuildData) return [];
             this.debug('convertRebuildDataToCitationData()');
             const citationData = rebuildData.map(obj => [0, obj[2], obj[0]]);
-            for (let i = 0, ilen = citationData.length; i < ilen; i++) {
+            for (let i = 0; i < citationData.length; i++) {
                 citationData[i][0] = i;
             }
             return citationData;
@@ -209,6 +226,8 @@ const citeSupport = (Store) => {
         /**
          * Function to be run immediately after document has been loaded, and
          *   before any editing operations.
+         *
+         * TODO: Impure function. Remove.
          *
          * @return {void}
          */
@@ -234,14 +253,14 @@ const citeSupport = (Store) => {
          *   `[citationIndex, citationText, citationID]`
          * @return {void}
          */
-        setCitations(mode, data) {
+        setCitations(mode: string, data: Object[]) {
             this.debug('setCitations()');
 
             // Assure that every citation node has citationID
             // Store data on any node of first impression
             const citationNodes = document.getElementsByClassName('citation');
 
-            for (let i = 0, ilen = data.length; i < ilen; i++) {
+            for (let i = 0; i < data.length; i++) {
                 const citationNode = citationNodes[data[i][0]];
                 if (!citationNode) return;
                 const citationID = data[i][2];
@@ -252,7 +271,7 @@ const citeSupport = (Store) => {
                     if (this.config.demo) {
                         // Demo-only hack, used to reconstruct document state on load
                         const pegs = document.getElementsByClassName('citeme');
-                        for (let j = 0, jlen = pegs.length; j < jlen; j++) {
+                        for (let j = 0; j < pegs.length; j++) {
                             const sib = pegs[j].nextSibling;
                             if (sib && sib.getAttribute && sib.getAttribute('id') === citationID) {
                                 if (!this.config.citationIdToPos) this.config.citationIdToPos = {};
@@ -263,7 +282,7 @@ const citeSupport = (Store) => {
                         // citationIdToPos isn't used for anything other
                         // than (optionally) validation
                         const citations = document.getElementsByClassName('citation');
-                        for (let j = 0, jlen = citations.length; j < jlen; j++) {
+                        for (let j = 0; j < citations.length; j++) {
                             const citation = citations[j];
                             if (citation && citation.getAttribute && citation.id === citationID) {
                                 // NOTE: If stashing data on citation nodes,
@@ -298,7 +317,7 @@ const citeSupport = (Store) => {
 
                 footnoteContainer.hidden = data.length === 0;
 
-                for (let i = 0, ilen = data.length; i < ilen; i++) {
+                for (let i = 0; i < data.length; i++) {
                     // Get data for each cite for update (ain't pretty)
                     const tuple = data[i];
                     const citationID = tuple[2];
@@ -324,9 +343,9 @@ const citeSupport = (Store) => {
                 // Reset the number on all footnote markers
                 // (the processor does not issue updates for note-number-only changes)
                 const footnoteMarkNodes = document.getElementsByClassName('footnote-mark');
-                for (let i = 0, ilen = footnoteMarkNodes.length; i < ilen; i++) {
+                for (let i = 0; i < footnoteMarkNodes.length; i++) {
                     const footnoteMarkNode = footnoteMarkNodes[i];
-                    footnoteMarkNode.innerHTML = (i + 1);
+                    footnoteMarkNode.innerHTML = (i + 1).toString();
                 }
                 // Remove all footnotes
                 const footnotes = document.getElementsByClassName('footnote');
@@ -335,7 +354,7 @@ const citeSupport = (Store) => {
                 }
                 // Regenerate all footnotes from hidden texts
 
-                for (let i = 0, ilen = citationNodes.length; i < ilen; i++) {
+                for (let i = 0; i < citationNodes.length; i++) {
                     const footnoteText = citationNodes[i].childNodes[1].innerHTML;
                     const footnoteNumber = (i + 1);
                     const footnote = document.createElement('div');
@@ -350,7 +369,7 @@ const citeSupport = (Store) => {
             } else {
                 const footnoteContainer = document.getElementById('footnote-container');
                 footnoteContainer.hidden = true;
-                for (let i = 0, ilen = data.length; i < ilen; i++) {
+                for (let i = 0; i < data.length; i++) {
                     const tuple = data[i];
                     const citationID = tuple[2];
                     const citationNode = document.getElementById(citationID);
@@ -363,10 +382,12 @@ const citeSupport = (Store) => {
         /**
          * Replace bibliography with xHTML returned by the processor.
          *
+         * TODO: This needs to be either replaced or removed.
+         *
          * @param {Object[]} data An array consisting of [0] an object with style
          *   information and [1] an array of serialized xHMTL bibliography entries.
          */
-        setBibliography(data) {
+        setBibliography(data: [Object, string[]]) {
             this.debug('setBibliography()');
             const bibContainer = document.getElementById('bibliography-container');
             if (!data || !data[1] || data[1].length === 0) {
@@ -378,7 +399,7 @@ const citeSupport = (Store) => {
             bib.innerHTML = data[1].join('\n');
             const entries = document.getElementsByClassName('csl-entry');
             if (data[0].hangingindent) {
-                for (let i = 0, ilen = entries.length; i < ilen; i++) {
+                for (let i = 0; i < entries.length; i++) {
                     const entry = entries[i];
                     entry.style.cssText = 'padding-left: 1.3em;text-indent: -1.3em;';
                 }
@@ -389,12 +410,12 @@ const citeSupport = (Store) => {
                 `width: ${(data[0].maxoffset / 2) + 0.5}em;` :
                 'padding-right:0.3em;';
 
-                for (let i = 0, ilen = entries.length; i < ilen; i++) {
+                for (let i = 0; i < entries.length; i++) {
                     const entry = entries[i];
                     entry.style.cssText = 'white-space: nowrap;';
                 }
                 const numbers = document.getElementsByClassName('csl-left-margin');
-                for (let i = 0, ilen = numbers.length; i < ilen; i++) {
+                for (let i = 0; i < numbers.length; i++) {
                     const num = numbers[i];
                     num.style.cssText = `display:inline-block; ${offsetSpec}`;
                 }
@@ -404,7 +425,7 @@ const citeSupport = (Store) => {
                     const containerWidth = document.getElementById('dynamic-editing').offsetWidth;
                     const numberWidth = (data[0].maxoffset * (90 / 9));
                     const widthSpec = `width: ${(containerWidth - numberWidth - 20)}px;`;
-                    for (let i = 0, ilen = texts.length; i < ilen; i++) {
+                    for (let i = 0; i < texts.length; i++) {
                         const text = texts[i];
                         text.style.cssText =
                             `display: inline-block; white-space: normal; ${widthSpec}`;
@@ -429,9 +450,11 @@ const citeSupport = (Store) => {
          * This is demo code: replace it with something more sophisticated
          * for production.
          *
+         * TODO: This needs to be removed
+         *
          * @param {Event} e An event generated by the DOM
          */
-        citationWidgetHandler(e) {
+        citationWidgetHandler(e: Event) {
             this.debug('citationWidgetHandler()');
 
             // In the demo, citations are set on a "citeme peg"
@@ -443,7 +466,7 @@ const citeSupport = (Store) => {
             // If the peg is not followed by a citation node, add
             // one and open it for editing.
 
-            const peg = e.target;
+            const peg = e.target as HTMLElement;
             const sibling = peg.nextSibling;
             const hasCitation = (
                 sibling &&
@@ -464,13 +487,15 @@ const citeSupport = (Store) => {
         /**
          * Presents an interface for inserting citations.
          *
+         * TODO: This needs to be removed
+         *
          * This is demo code: replace this function with something more
          * sophisticated for production.
          *
-         * @param {htmlElement} citation A span node with class `citation`
+         * @param {HTMLElement} citationNode A span node with class `citation`
          * @return {void}
          */
-        citationWidget(citationNode) {
+        citationWidget(citationNode: HTMLElement) {
             this.debug('citationWidget()');
 
             const itemData = [
@@ -500,7 +525,7 @@ const citeSupport = (Store) => {
             citeMenu.setAttribute('id', 'cite-menu');
             let innerHTML = '<div class="menu">';
 
-            for (let i = 0, ilen = itemData.length; i < ilen; i++) {
+            for (let i = 0; i < itemData.length; i++) {
                 const itemID = itemData[i].id;
                 const itemTitle = itemData[i].title;
                 innerHTML +=
@@ -524,7 +549,7 @@ const citeSupport = (Store) => {
 
             if (citationID) {
                 let citation;
-                for (let i = 0, ilen = this.config.citationByIndex.length; i < ilen; i++) {
+                for (let i = 0; i < this.config.citationByIndex.length; i++) {
                     if (this.config.citationByIndex[i].citationID === citationID) {
                         citation = this.config.citationByIndex[i];
                     }
@@ -532,7 +557,7 @@ const citeSupport = (Store) => {
                 // Although citation should ALWAYS exist if document data has cleared validation
                 if (citation) {
                     const itemIDs = citation.citationItems.map(obj => obj.id);
-                    for (let i = 0, ilen = itemIDs.length; i < ilen; i++) {
+                    for (let i = 0; i < itemIDs.length; i++) {
                         const menuItem = document.getElementById(itemIDs[i]);
                         menuItem.checked = true;
                     }
@@ -558,6 +583,8 @@ const citeSupport = (Store) => {
          *     - If this is an existing citation and items are to be used,
          *       update this citation in context.
          *
+         * TODO: Impure function. Remove.
+         *
          * @params {Event} e An event object
          * @return {void}
          */
@@ -579,11 +606,11 @@ const citeSupport = (Store) => {
             const citationNodes = document.getElementsByClassName('citation');
             const citationByIndex = [];
             const citationMap = {};
-            for (let i = 0, ilen = this.config.citationByIndex.length; i < ilen; i++) {
+            for (let i = 0; i < this.config.citationByIndex.length; i++) {
                 const citation = this.config.citationByIndex[i];
                 citationMap[citation.citationID] = i;
             }
-            for (let i = 0, ilen = citationNodes.length; i < ilen; i++) {
+            for (let i = 0; i < citationNodes.length; i++) {
                 const node = citationNodes[i];
                 const id = node.id;
                 if (id) {
@@ -603,7 +630,7 @@ const citeSupport = (Store) => {
             //   This will give the processor correct information for back-reference
             //   cites in footnote styles.
 
-            for (let i = 0, ilen = citationByIndex.length; i < ilen; i++) {
+            for (let i = 0; i < citationByIndex.length; i++) {
                 const citation = citationByIndex[i];
                 if (citation.citationID) {
                     if (this.config.mode === 'note') {
@@ -719,10 +746,10 @@ const citeSupport = (Store) => {
          *
          *
          *
-         * @param {HtmlElementList} nodes A list of citation nodes
+         * @param {HTMLCollection} nodes A list of citation nodes
          * @return {Object[]} splitData An object with citation object as `citation`, an
          */
-        getCitationSplits(nodes) {
+        getCitationSplits(nodes: HTMLCollection) {
             this.debug('getCitationSplits()');
             const splitData = {
                 citation: null,
@@ -732,7 +759,7 @@ const citeSupport = (Store) => {
             let current = 'citationsPre';
             let offset = 0;
             if (nodes) {
-                for (let i = 0, ilen = nodes.length; i < ilen; i++) {
+                for (let i = 0; i < nodes.length; i++) {
                     const node = nodes[i];
                     if (node.firstChild && node.firstChild.id === 'cite-menu') {
                         current = 'citationsPost';
@@ -763,14 +790,14 @@ const citeSupport = (Store) => {
         /**
          * Read and return selections from citation menu.
          *
-         * @param {HtmlElement} menu A DOM node containing input elements of type `checkbox`
+         * @param {HTMLElement} menu A DOM node containing input elements of type `checkbox`
          * @return {Object[]} An array of objects, each with an `id` value
          */
-        getCitationItemIdsFrom(menu) {
+        getCitationItemIdsFrom(menu: HTMLElement) {
             this.debug('getCitationItemIdsFrom()');
             const citationItems = [];
             const checkboxes = menu.getElementsByTagName('input');
-            for (let i = 0, ilen = checkboxes.length; i < ilen; i++) {
+            for (let i = 0; i < checkboxes.length; i++) {
                 const checkbox = checkboxes[i];
                 if (checkbox.checked) {
                     citationItems.push({
@@ -785,9 +812,10 @@ const citeSupport = (Store) => {
          * Listen for selections on the style menu, and initialize the processor
          *   for the selected style.
          *
+         * NOTE: This has got to go. Memory leaks inevitable.
+         *
          * @return {void}
          */
-        // NOTE: This has got to go. Memory leaks inevitable.
         setStyleListener() {
             this.debug('setStyleListener()');
             document.body.addEventListener('change', (e) => {
@@ -808,8 +836,11 @@ const citeSupport = (Store) => {
          * This is a demo-specific hack for the citation widget.
          * It's a helper function used to keep the widget in-frame on
          * small devices.
+         *
+         * TODO: Remove this. Not relevant for this class
+         *
          */
-        hasRoomForMenu(obj) {
+        hasRoomForMenu(obj: Object) {
             let curleft = 0;
             let curtop = 0;
             if (obj.offsetParent) {
