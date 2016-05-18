@@ -244,7 +244,7 @@ class CiteSupport {
      * @return {Object[]}
      */
     convertRebuildDataToCitationData(rebuildData) {
-        if (!rebuildData) return;
+        if (!rebuildData) return [];
         this.debug('convertRebuildDataToCitationData()');
         const citationData = rebuildData.map(obj => [0, obj[2], obj[0]]);
         for (let i = 0, ilen = citationData.length; i < ilen; i++) {
@@ -424,7 +424,7 @@ class CiteSupport {
         if (data[0].hangingindent) {
             for (let i = 0, ilen = entries.length; i < ilen; i++) {
                 const entry = entries[i];
-                entry.cssText('padding-left: 1.3em;text-indent: -1.3em;');
+                entry.style.cssText = 'padding-left: 1.3em;text-indent: -1.3em;';
             }
             bibContainer.hidden = false;
             bib.setAttribute('style', 'visibility: visible;');
@@ -435,12 +435,12 @@ class CiteSupport {
 
             for (let i = 0, ilen = entries.length; i < ilen; i++) {
                 const entry = entries[i];
-                entry.cssText = 'white-space: nowrap;';
+                entry.style.cssText = 'white-space: nowrap;';
             }
             const numbers = document.getElementsByClassName('csl-left-margin');
             for (let i = 0, ilen = numbers.length; i < ilen; i++) {
                 const number = numbers[i];
-                number.cssText = `display:inline-block; ${offsetSpec}`;
+                number.style.cssText = `display:inline-block; ${offsetSpec}`;
             }
             if (data[0].maxoffset) {
                 // cheat
@@ -450,7 +450,7 @@ class CiteSupport {
                 const widthSpec = `width: ${(containerWidth - numberWidth - 20)}px;`;
                 for (let i = 0, ilen = texts.length; i < ilen; i++) {
                     const text = texts[i];
-                    text.cssText = `display: inline-block; white-space: normal; ${widthSpec}`;
+                    text.style.cssText = `display: inline-block; white-space: normal; ${widthSpec}`;
                 }
                 bibContainer.hidden = false;
                 bib.style.visibility = 'visible';
