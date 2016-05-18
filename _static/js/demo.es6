@@ -1,4 +1,4 @@
-import citeSupport from './citesupport-es6.js';
+import citeSupport from './citesupport.es6';
 
 
 class SafeStorage {

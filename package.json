@@ -5,8 +5,8 @@
   "main": "citeproc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel ./_static/js/*.es6 --out-file ./_static/js/demo.js --source-maps inline && webpack ./_static/js/demo.js ./_static/js/bundle.js && rm -f ./_static/js/demo.js",
-    "reset": "rm -rf ./_build && npm run build && make html && http-server ./_build/html/"
+    "build": "webpack",
+    "reset": "rm -rf ./_build && webpack && make html && http-server ./_build/html/"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Juris-M/citeproc-js-docs#readme",
   "devDependencies": {
     "babel-cli": "^6.9.0",
+    "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
     "eslint": "^2.9.0",
     "eslint-config-airbnb": "^9.0.1",
