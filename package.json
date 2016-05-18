@@ -5,7 +5,8 @@
   "main": "citeproc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel ./_static/js/citesupport.es6 -o ./_static/js/citesupport-es6.js"
+    "build": "babel ./_static/js/citesupport.es6 -o ./_static/js/citesupport-es6.js",
+    "reset": "rm -rf ./_build && npm run build && make html"
   },
   "repository": {
     "type": "git",

@@ -200,9 +200,6 @@ class CiteSupport {
     callInitProcessor(styleName, localeName, citationByIndex) {
         this.debug('callInitProcessor()');
         this.config.processorReady = false;
-        if (!citationByIndex) {
-            citationByIndex = [];
-        }
         this.worker.postMessage({
             command: 'initProcessor',
             styleName,
@@ -293,6 +290,7 @@ class CiteSupport {
 
         for (let i = 0, ilen = data.length; i < ilen; i++) {
             const citationNode = citationNodes[data[i][0]];
+            if (!citationNode) return;
             const citationID = data[i][2];
 
             if (!citationNode.id) {
@@ -583,7 +581,7 @@ class CiteSupport {
                 }
             }
         }
-        button.addEventListener('click', this.citationEditHandler);
+        button.addEventListener('click', this.citationEditHandler.bind(this));
     }
 
     /**
