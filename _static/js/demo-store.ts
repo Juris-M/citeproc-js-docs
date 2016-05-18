@@ -1,7 +1,5 @@
-import citeSupport from './citesupport.es6';
 
-
-class SafeStorage {
+export default class SafeStorage {
 
     constructor(config) {
         this.config = config;
@@ -64,15 +62,3 @@ class SafeStorage {
     }
 
 }
-
-// const citesupport = new CiteSupport(SafeStorage);
-const citesupport = citeSupport(SafeStorage);
-
-
-window.addEventListener('load', () => {
-    citesupport.buildStyleMenu();
-    citesupport.spoofDocument();
-    citesupport.initDocument();
-    citesupport.setStyleListener();
-    citesupport.setPegListener();
-});

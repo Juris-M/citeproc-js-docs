@@ -51,6 +51,20 @@
 const citeSupport = (Store) => {
     class Supporter {
 
+        public config: any;
+        public store: any;
+        public worker: Worker;
+
+        init(e) {
+            this.debug('initProcessor()');
+            this.config.mode = e.data.xclass;
+            const citationData = this.convertRebuildDataToCitationData(e.data.rebuildData);
+            this.setCitations(this.config.mode, citationData);
+            this.setBibliography(e.data.bibliographyData);
+            this.store.citationByIndex = this.config.citationByIndex;
+            this.config.processorReady = true;
+        }
+
         constructor() {
             this.config = {
                 debug: true,
@@ -67,16 +81,16 @@ const citeSupport = (Store) => {
             this.worker.onmessage = (e) => {
                 switch (e.data.command) {
                 /**
-                * In response to `callInitProcessor` request, refresh
-                *   `config.mode`, and document citations (if any)
-                *   and document bibliography (if any).
-                *
-                * @param {string} xclass Either `note` or `in-text` as a string
-                * @param {Object[]} rebuildData Array of elements with the form
-                *   `[citationID, noteNumber, citeString]`
-                * @param {Object[]} bibliographyData Array of serialized
-                *   xHTML bibliography entries
-                */
+                 * In response to `callInitProcessor` request, refresh
+                 *   `config.mode`, and document citations (if any)
+                 *   and document bibliography (if any).
+                 *
+                 * @param {string} xclass Either `note` or `in-text` as a string
+                 * @param {Object[]} rebuildData Array of elements with the form
+                 *   `[citationID, noteNumber, citeString]`
+                 * @param {Object[]} bibliographyData Array of serialized
+                 *   xHTML bibliography entries
+                 */
                 case 'initProcessor': {
                     this.debug('initProcessor()');
                     this.config.mode = e.data.xclass;
@@ -88,16 +102,16 @@ const citeSupport = (Store) => {
                     break;
                 }
                 /**
-                * In response to `callRegisterCitation`, refresh `config.citationByIndex`,
-                *   set citations that require update in the document, replace
-                *   the bibliography in the document, and save the `citationByIndex` array
-                *   for persistence.
-                *
-                * @param {Object[]} citationByIndex Array of registered citation objects
-                * @param {Object[]} citationData Array of elements with the form
-                *   `[noteNumber, citeString]`
-                * @param {Object[]} bibliographyData Array of serialized xHTML bibliography entries
-                */
+                 * In response to `callRegisterCitation`, refresh `config.citationByIndex`,
+                 *   set citations that require update in the document, replace
+                 *   the bibliography in the document, and save the `citationByIndex` array
+                 *   for persistence.
+                 *
+                 * @param {Object[]} citationByIndex Array of registered citation objects
+                 * @param {Object[]} citationData Array of elements with the form
+                 *   `[noteNumber, citeString]`
+                 * @param {Object[]} bibliographyData Array of serialized xHTML bibliography entries
+                 */
                 case 'registerCitation': {
                     this.debug('registerCitation()');
                     this.config.citationByIndex = e.data.citationByIndex;
@@ -115,10 +129,10 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Logs messages to the console if `config.debug` is true
-        * @param  {string} txt The message to log
-        * @return {void}
-        */
+         * Logs messages to the console if `config.debug` is true
+         * @param  {string} txt The message to log
+         * @return {void}
+         */
         debug(txt) {
             if (this.config.debug) {
                 console.log(`*** ${txt}`);
@@ -126,14 +140,14 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Initializes the processor, optionally populating it with a
-        *   preexisting list of citations.
-        *
-        * @param {string} styleName The ID of a style
-        * @param {string} localeName The ID of a locale
-        * @param {Object[]} citationByIndex An array of citation objects with citationIDs
-        * @return {void}
-        */
+         * Initializes the processor, optionally populating it with a
+         *   preexisting list of citations.
+         *
+         * @param {string} styleName The ID of a style
+         * @param {string} localeName The ID of a locale
+         * @param {Object[]} citationByIndex An array of citation objects with citationIDs
+         * @return {void}
+         */
         callInitProcessor(styleName, localeName, citationByIndex) {
             this.debug('callInitProcessor()');
             this.config.processorReady = false;
@@ -146,16 +160,16 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Registers a single citation in the processor to follow
-        *   citations described by `preCitations` and precede those
-        *   described in `postCitations`.
-        *
-        * @param {Object{}} citation A citation object
-        * @param {Object[]} preCitations Array of `[citationID, noteNumber]` pairs in document order
-        * @param {Object[]} postCitations Array of `[citationID, noteNumber]`
-        *   pairs in document order
-        * @return {void}
-        */
+         * Registers a single citation in the processor to follow
+         *   citations described by `preCitations` and precede those
+         *   described in `postCitations`.
+         *
+         * @param {Object{}} citation A citation object
+         * @param {Object[]} preCitations Array of `[citationID, noteNumber]` pairs in document order
+         * @param {Object[]} postCitations Array of `[citationID, noteNumber]`
+         *   pairs in document order
+         * @return {void}
+         */
         callRegisterCitation(citation, preCitations, postCitations) {
             if (!this.config.processorReady) return;
             this.debug('callRegisterCitation()');
@@ -169,19 +183,19 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Converts the array returned by the processor `rebuildProcessor()` method
-        * to the form digested by our own `setCitations()` method.
-        *
-        * rebuildData has this structure:
-        *    [<citation_id>, <note_number>, <citation_string>]
-        *
-        * setCitations() wants this structure:
-        *    [<citation_index>, <citation_string>, <citation_id>]
-        *
-        * @param {Object[]} rebuildData An array of values for insertion
-        *   of citations into a document
-        * @return {Object[]}
-        */
+         * Converts the array returned by the processor `rebuildProcessor()` method
+         * to the form digested by our own `setCitations()` method.
+         *
+         * rebuildData has this structure:
+         *    [<citation_id>, <note_number>, <citation_string>]
+         *
+         * setCitations() wants this structure:
+         *    [<citation_index>, <citation_string>, <citation_id>]
+         *
+         * @param {Object[]} rebuildData An array of values for insertion
+         *   of citations into a document
+         * @return {Object[]}
+         */
         convertRebuildDataToCitationData(rebuildData) {
             if (!rebuildData) return [];
             this.debug('convertRebuildDataToCitationData()');
@@ -193,11 +207,11 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Function to be run immediately after document has been loaded, and
-        *   before any editing operations.
-        *
-        * @return {void}
-        */
+         * Function to be run immediately after document has been loaded, and
+         *   before any editing operations.
+         *
+         * @return {void}
+         */
         initDocument() {
             this.debug('initDocument()');
             this.callInitProcessor(
@@ -208,18 +222,18 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Update all citations based on data returned by the processor.
-        * The update has two effects: (1) the id of all in-text citation
-        * nodes is set to the processor-assigned citationID; and (2)
-        * citation texts are updated. For footnote styles, the footnote
-        * block is regenerated from scratch, using hidden text stored
-        * in the citation elements.
-        *
-        * @param {string} mode The mode of the current style, either `in-text` or `note`
-        * @param {Object[]} data An array of elements with the form
-        *   `[citationIndex, citationText, citationID]`
-        * @return {void}
-        */
+         * Update all citations based on data returned by the processor.
+         * The update has two effects: (1) the id of all in-text citation
+         * nodes is set to the processor-assigned citationID; and (2)
+         * citation texts are updated. For footnote styles, the footnote
+         * block is regenerated from scratch, using hidden text stored
+         * in the citation elements.
+         *
+         * @param {string} mode The mode of the current style, either `in-text` or `note`
+         * @param {Object[]} data An array of elements with the form
+         *   `[citationIndex, citationText, citationID]`
+         * @return {void}
+         */
         setCitations(mode, data) {
             this.debug('setCitations()');
 
@@ -347,11 +361,11 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Replace bibliography with xHTML returned by the processor.
-        *
-        * @param {Object[]} data An array consisting of [0] an object with style
-        *   information and [1] an array of serialized xHMTL bibliography entries.
-        */
+         * Replace bibliography with xHTML returned by the processor.
+         *
+         * @param {Object[]} data An array consisting of [0] an object with style
+         *   information and [1] an array of serialized xHMTL bibliography entries.
+         */
         setBibliography(data) {
             this.debug('setBibliography()');
             const bibContainer = document.getElementById('bibliography-container');
@@ -381,8 +395,8 @@ const citeSupport = (Store) => {
                 }
                 const numbers = document.getElementsByClassName('csl-left-margin');
                 for (let i = 0, ilen = numbers.length; i < ilen; i++) {
-                    const number = numbers[i];
-                    number.style.cssText = `display:inline-block; ${offsetSpec}`;
+                    const num = numbers[i];
+                    num.style.cssText = `display:inline-block; ${offsetSpec}`;
                 }
                 if (data[0].maxoffset) {
                     // cheat
@@ -407,16 +421,16 @@ const citeSupport = (Store) => {
             }
         }
         /**
-        * Set or acquire a citation node for editing. If the node is
-        * newly set, it will not have a processor-assigned citationID.
-        * The presence or absence of citationID is used in later code to
-        * determine how to handle a save operation.
-        *
-        * This is demo code: replace it with something more sophisticated
-        * for production.
-        *
-        * @param {Event} e An event generated by the DOM
-        */
+         * Set or acquire a citation node for editing. If the node is
+         * newly set, it will not have a processor-assigned citationID.
+         * The presence or absence of citationID is used in later code to
+         * determine how to handle a save operation.
+         *
+         * This is demo code: replace it with something more sophisticated
+         * for production.
+         *
+         * @param {Event} e An event generated by the DOM
+         */
         citationWidgetHandler(e) {
             this.debug('citationWidgetHandler()');
 
@@ -448,14 +462,14 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Presents an interface for inserting citations.
-        *
-        * This is demo code: replace this function with something more
-        * sophisticated for production.
-        *
-        * @param {htmlElement} citation A span node with class `citation`
-        * @return {void}
-        */
+         * Presents an interface for inserting citations.
+         *
+         * This is demo code: replace this function with something more
+         * sophisticated for production.
+         *
+         * @param {htmlElement} citation A span node with class `citation`
+         * @return {void}
+         */
         citationWidget(citationNode) {
             this.debug('citationWidget()');
 
@@ -528,25 +542,25 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Perform the update operation appropriate to selections
-        *   and context.
-        *
-        *     - If this is a fresh citation and no items are to be added,
-        *       remove the menu and citation node.
-        *     - If this is a fresh citation and items are to be added,
-        *       request the update from the processor.
-        *     - If this is an existing citation and no items are to be used,
-        *       and removing the existing cites leaves none, request processor
-        *       initialization.
-        *     - If this is an existing citation and no items are to be used,
-        *       and removing the existing cites will leave some, update
-        *       using the first citation in the document.
-        *     - If this is an existing citation and items are to be used,
-        *       update this citation in context.
-        *
-        * @params {Event} e An event object
-        * @return {void}
-        */
+         * Perform the update operation appropriate to selections
+         *   and context.
+         *
+         *     - If this is a fresh citation and no items are to be added,
+         *       remove the menu and citation node.
+         *     - If this is a fresh citation and items are to be added,
+         *       request the update from the processor.
+         *     - If this is an existing citation and no items are to be used,
+         *       and removing the existing cites leaves none, request processor
+         *       initialization.
+         *     - If this is an existing citation and no items are to be used,
+         *       and removing the existing cites will leave some, update
+         *       using the first citation in the document.
+         *     - If this is an existing citation and items are to be used,
+         *       update this citation in context.
+         *
+         * @params {Event} e An event object
+         * @return {void}
+         */
         citationEditHandler() {
             this.debug('citationEditHandler()');
             const menu = document.getElementById('cite-menu');
@@ -618,11 +632,10 @@ const citeSupport = (Store) => {
                     // Remove citation from citationByIndex and citationIDs
                     for (let i = this.config.citationByIndex.length - 1; i > -1; i--) {
                         if (this.config.citationByIndex[i].citationID === citationID) {
-                            this.config.citationByIndex =
-                            this.config.citationByIndex
-                            .slice(0, i)
-                            .concat(this.config.citationByIndex
-                                .slice(i + 1));
+                            this.config.citationByIndex = [
+                                ...this.config.citationByIndex.slice(0, i),
+                                ...this.config.citationByIndex.slice(i + 1),
+                            ];
 
                             // Adjust note numbers in citationByIndex child properties if note style
                             if (this.config.mode === 'note') {
@@ -696,19 +709,19 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Return a citation and descriptive arrays representing
-        *   citations before and after its position.
-        *
-        * If `nodes` argument is provided, return a citation object for
-        *   the current citation open for editing. If no `nodes` argument
-        *   is given, use the first citation in the document as the
-        *   "current" citation.
-        *
-        *
-        *
-        * @param {HtmlElementList} nodes A list of citation nodes
-        * @return {Object[]} splitData An object with citation object as `citation`, an
-        */
+         * Return a citation and descriptive arrays representing
+         *   citations before and after its position.
+         *
+         * If `nodes` argument is provided, return a citation object for
+         *   the current citation open for editing. If no `nodes` argument
+         *   is given, use the first citation in the document as the
+         *   "current" citation.
+         *
+         *
+         *
+         * @param {HtmlElementList} nodes A list of citation nodes
+         * @return {Object[]} splitData An object with citation object as `citation`, an
+         */
         getCitationSplits(nodes) {
             this.debug('getCitationSplits()');
             const splitData = {
@@ -748,11 +761,11 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Read and return selections from citation menu.
-        *
-        * @param {HtmlElement} menu A DOM node containing input elements of type `checkbox`
-        * @return {Object[]} An array of objects, each with an `id` value
-        */
+         * Read and return selections from citation menu.
+         *
+         * @param {HtmlElement} menu A DOM node containing input elements of type `checkbox`
+         * @return {Object[]} An array of objects, each with an `id` value
+         */
         getCitationItemIdsFrom(menu) {
             this.debug('getCitationItemIdsFrom()');
             const citationItems = [];
@@ -769,139 +782,12 @@ const citeSupport = (Store) => {
         }
 
         /**
-        * Replace citation span nodes and get ready to roll. Puts
-        *   document into the state it would have been in at first
-        *   opening had it been properly saved.
-        *
-        * @return {void}
-        */
-        spoofDocument() {
-            this.debug('spoofDocument()');
-
-            // Stage 1: Check that all array items have citationID
-            // const citationByIndex = this.store.citationByIndex;
-            const citationIDs = {};
-
-            for (let i = 0, ilen = this.config.citationByIndex.length; i > ilen; i++) {
-                const citation = this.config.citationByIndex[i];
-                if (!this.config.citationIDs[citation.citationID]) {
-                    this.debug(
-                        'WARNING: encountered a stored citation that was invalid ' +
-                        'or had no citationID. Removing citations.'
-                    );
-                    this.store.citationByIndex = [];
-                    this.store.citationIdToPos = {};
-                    break;
-                }
-                citationIDs[citation.citationID] = true;
-            }
-            this.config.citationIDs = citationIDs;
-
-            // Stage 2: check that all citation locations are in posToCitationId
-            // with existing citationIDs and have span tags set
-            let pegs;
-            if (this.config.demo) {
-                pegs = document.getElementsByClassName('citeme');
-            } else {
-                pegs = document.getElementsByClassName('citation');
-            }
-            for (let i = 0, ilen = this.config.citationByIndex.length; i < ilen; i++) {
-                const citation = this.config.citationByIndex[i];
-                const citationID = citation ? citation.citationID : null;
-                if (typeof this.config.citationIdToPos[citationID] !== 'number') {
-                    this.debug('WARNING: invalid state data. Removing citations.');
-                    this.store.citationByIndex = [];
-                    this.store.citationIdToPos = {};
-                    break;
-                } else if (this.config.demo) {
-                    const citationNode = document.createElement('span');
-                    citationNode.classList.add('citation');
-                    citationNode.setAttribute('id', citationID);
-                    const peg = pegs[this.config.citationIdToPos[citationID]];
-                    peg.parentNode.insertBefore(citationNode, peg.nextSibling);
-                }
-            }
-
-            // Stage 3: check that number of citation nodes and number of stored citations matches
-            const objectLength = this.config.citationByIndex.length;
-            const nodeLength = document.getElementsByClassName('citation').length;
-            if (objectLength !== nodeLength) {
-                this.debug(
-                    'WARNING: document citation node and citation object counts ' +
-                    'do not match. Removing citations.'
-                );
-                this.store.citationByIndex = [];
-                this.store.citationIdToPos = {};
-                const citations = document.getElementsByClassName('citation');
-                for (let i = 0, ilen = citations.length; i < ilen; i++) {
-                    citations[0].parentNode.removeChild(citations[0]);
-                }
-            }
-        }
-
-        /**
-        * Build a menu to set the style and trigger reinstantiation of
-        *   the processor. This menu will be needed in all deployments,
-        *   but is not part of the processor code itself.
-        *
-        * @return {void}
-        */
-        buildStyleMenu() {
-            this.debug('buildStyleMenu()');
-            const styleData = [
-                {
-                    title: 'ACM Proceedings',
-                    id: 'acm-sig-proceedings',
-                },
-                {
-                    title: 'AMA',
-                    id: 'american-medical-association',
-                },
-                {
-                    title: 'Chicago (author-date)',
-                    id: 'chicago-author-date',
-                },
-                {
-                    title: 'Chicago (full note)',
-                    id: 'jm-chicago-fullnote-bibliography',
-                },
-                {
-                    title: 'DIN-1505-2 (alpha)',
-                    id: 'din-1505-2-alphanumeric',
-                },
-                {
-                    title: 'JM Indigo',
-                    id: 'jm-indigobook',
-                },
-                {
-                    title: 'JM Indigo (L. Rev.)',
-                    id: 'jm-indigobook-law-review',
-                },
-                {
-                    title: 'JM OSCOLA',
-                    id: 'jm-oscola',
-                },
-            ];
-            const defaultStyle = this.store.defaultStyle;
-            const stylesMenu = document.getElementById('citation-styles');
-            for (let i = 0, ilen = styleData.length; i < ilen; i++) {
-                const styleDatum = styleData[i];
-                const option = document.createElement('option');
-                option.setAttribute('value', styleDatum.id);
-                if (styleDatum.id === defaultStyle) {
-                    option.selected = true;
-                }
-                option.innerHTML = styleDatum.title;
-                stylesMenu.appendChild(option);
-            }
-        }
-
-        /**
-        * Listen for selections on the style menu, and initialize the processor
-        *   for the selected style.
-        *
-        * @return {void}
-        */
+         * Listen for selections on the style menu, and initialize the processor
+         *   for the selected style.
+         *
+         * @return {void}
+         */
+        // NOTE: This has got to go. Memory leaks inevitable.
         setStyleListener() {
             this.debug('setStyleListener()');
             document.body.addEventListener('change', (e) => {
@@ -917,28 +803,12 @@ const citeSupport = (Store) => {
             });
         }
 
-        /**
-        * Listen for click events on the fixed pegs used in the demo.
-        *   This is cheating. :-)
-        *
-        * @return {void}
-        */
-        setPegListener() {
-            this.debug('setPegListener()');
-            document.body.addEventListener('click', (e) => {
-                if (!this.config.demo || e.target.classList.contains('citeme')) {
-                    if (document.getElementById('cite-menu')) return;
-                    this.citationWidgetHandler(e);
-                }
-            });
-        }
-
 
         /**
-        * This is a demo-specific hack for the citation widget.
-        * It's a helper function used to keep the widget in-frame on
-        * small devices.
-        */
+         * This is a demo-specific hack for the citation widget.
+         * It's a helper function used to keep the widget in-frame on
+         * small devices.
+         */
         hasRoomForMenu(obj) {
             let curleft = 0;
             let curtop = 0;

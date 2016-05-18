@@ -1,6 +1,6 @@
 
 module.exports = {
-    entry: './_static/js/demo.es6',
+    entry: './_static/js/demo.ts',
     output: {
         filename: 'bundle.js',
         path: './_static/js',
@@ -8,14 +8,14 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.es6$/,
+                test: /\.tsx?$/,
                 exclude: /node_modules/,
-                loader: 'babel?presets[]=es2015',
+                loader: 'babel?presets[]=es2015,presets[]=react!ts',
             },
         ],
     },
     resolve: {
-        extensions: ['', '.es6', '.js'],
+        extensions: ['', '.ts', '.tsx', '.js'],
     },
     devtool: 'source-map',
 };
