@@ -53,9 +53,9 @@ Field Types
 
 .. code-block:: javascript
 
-   {
-	"id":"unique_string-1219205"
-   }
+    {
+        "id":"unique_string-1219205"
+    }
 
 !!!!!!!!!!
 *Type* Field
@@ -64,10 +64,10 @@ Field Types
 
 .. code-block:: javascript
 
-   {
-	"id":"unique_string-1219205",
-	"type":"book"
-   }
+    {
+        "id":"unique_string-1219205",
+        "type":"book"
+    }
 
 !!!!!!!!!!!!!!!!!!!
 Ordinary Field Type
@@ -76,12 +76,12 @@ An ordinary field type is a simple field containing a string or numeric value. I
 
 .. code-block:: javascript
 
-   {
-	"id":"unique_string-1219205",
-	"type":"book",
-	"title":"Book Title",
-	"arbitraryField":"An example arbitrary field with arbitrary data. This field will be ignored by the CSL Processor."
-   }
+    {
+	    "id":"unique_string-1219205",
+	    "type":"book",
+	    "title":"Book Title",
+	    "arbitraryField":"An example arbitrary field with arbitrary data. This field will be ignored by the CSL Processor."
+    }
 
 !!!!!!!!!!!!!!!!!
 Person Field Type
@@ -92,47 +92,47 @@ The CSL-JSON allows some flexibility about how parts of a person's name are enco
 
 .. code-block:: javascript
 
-   "author": [
-	{
-		"family": "de las Casas",
-		"given": "Bartolomé",
-	},
-	{
-		"family": "King",
-		"given": "Rev. Martin Luther Jr., Ph.D.",
-	}
-   ]
+    "author": [
+	    {
+		    "family": "de las Casas",
+		    "given": "Bartolomé",
+	    },
+	    {
+		    "family": "King",
+		    "given": "Rev. Martin Luther Jr., Ph.D.",
+	    }
+	]
 
 In the previous example, lowercase elements before the family name are treated as “non-dropping” particles, and lowercase elements following the given name as “dropping” particles. However, these special name parts could also be encoded in discrete properties.
 
 .. code-block:: javascript
 
-   "author": [
-	{
-		"family": "Casas",
-		"given": "Bartolomé",
-		"non-dropping-particle":"de las"
-	},
-	{
-		"family": "King",
-		"given": "Martin Luther",
-		"suffix":"Jr., Ph.D.",
-		"dropping-particle":"Rev."
-	}
-   ]
+    "author": [
+	    {
+		    "family": "Casas",
+    		"given": "Bartolomé",
+	    	"non-dropping-particle":"de las"
+	    },
+	    {
+		    "family": "King",
+		    "given": "Martin Luther",
+		    "suffix":"Jr., Ph.D.",
+		    "dropping-particle":"Rev."
+	    }
+    ]
 
 Some personal names are represented by a single field (e.g. mononyms such as "Prince" or "Plato"). In such cases, the name can be delivered as a lone family element. Institutional names may be delivered in the same way, but it is preferred to set them instead as a literal element:
 
 .. code-block:: javascript
 
    "author": [
-	{
-		"family": "Socrates",
-	},
-	{
-		"literal": "International Business Machines"
-	}
-   ]
+	    {
+		    "family": "Socrates",
+	    },
+	    {
+		    "literal": "International Business Machines"
+	    }
+    ]
 
 !!!!!!!!!!!!!!!
 Date Field Type
@@ -143,51 +143,54 @@ A date field is a complex field that expresses a date or a range of dates. An ex
 
 .. code-block:: javascript
 
-   "archived": [
-	{
-		"date-parts": [ 2005, 4, 12 ]
-	}
-   ],
-   "issued": [
-	{
-		"date-parts": [[ 2000, 3, 15 ], [2000, 3, 17]]
-	}
-   ]
+    "archived": [
+	    {
+		    "date-parts": [ 2005, 4, 12 ]
+	    }
+    ],
+    "issued": [
+    	{
+	    	"date-parts": [[ 2000, 3, 15 ], [2000, 3, 17]]
+	    }
+    ]
 
 The second date format is a raw string. The recommended encoding is a string that represents the date in a numberic year-month-day format. However, the date parser in citeproc-js will correctly interpret a wide variety of sensible date conventions.
 
 *Raw Format*
 
 .. code-block:: javascript
-   "archived": [
-	{
-		"raw": "2005-4-12"
-	}
-   ],
-   "issued": [
-	{
-		"raw": "2000-3-15/2000-3-17"
-	}
-   ]
-		      
+
+    "archived": [
+        {
+		    "raw": "2005-4-12"
+	    }
+    ],
+    "issued": [
+	    {
+		    "raw": "2000-3-15/2000-3-17"
+	    }
+    ]
+
+
 Citation Items Container
 ========================
 
 In CSL-JSON, a container for citation items is an array. When passing citation items to the Processor, an array ensures that the ordering of citations is preserved.
 
 .. code-block:: javascript
-   CitationItems = [
-	{
-		"id":"item1",
-		"type":"article",
-		"title":"Title for an Article"
-	},
-	{
-		"id":"item2",
-		"type":"book",
-		"title":"Book title"
-	}
-   ]
+
+    CitationItems = [
+	    {
+		    "id":"item1",
+		    "type":"article",
+		    "title":"Title for an Article"
+	    },
+	    {
+		    "id":"item2",
+		    "type":"book",
+	    	"title":"Book title"
+	    }
+    ]
    
 -------------------------
 HTML-like formatting tags
