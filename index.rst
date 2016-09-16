@@ -23,6 +23,7 @@ Table of Contents
    acknowledgements.rst
    changes.rst
    deployments.rst
+   processcitations/specification.rst
    dynamic-editing.rst
    editor.rst
    setting-up.rst
