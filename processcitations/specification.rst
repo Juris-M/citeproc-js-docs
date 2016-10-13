@@ -60,14 +60,14 @@ currentCitationCluster Parameter
 
 The *currentCitationCluster* parameter is an object that contains three properties: 'citationItems', 'properties', and 'citationID'.
 
-**'citationItems'** is a required property that contains an array of objects representing the sources referenced within a citation cluster. The objects within the 'citationItems' array must have a property "id" whose value is the item ID that can be used by the *sys* object to retrieve the relevant information about the source.
+**'citationItems'** is a required property that contains an array of objects representing the sources referenced within a citation cluster. The objects within the 'citationItems' array must have a property "id" whose value is the item ID that can be used by the *sys* object to retrieve the relevant information about the source. Optional properties include "locator", "prefix", and "suffix". The "locator" property contains the information needed for users to pinpoint the attribution within a source. The "prefix" property contains an explantory prefix or introductory indicator, such as "see" or "confer". The "suffix" property contains the an explanatory suffix.
 **'properties'** is a required property that contains an object, but the object may be empty. In citation styles that use footnotes or endnotes, the "properties" object must have a "noteIndex" property that contains the value of the footnote number or endnote number occupied by the citation cluster.
 **"citationID"** is an optional property that contains a string. "citationID" is only used when editing an already processed citation cluster. Its value is the *cluster ID* of the citation cluster.
 
 .. code-block:: javascript
 		
    {
-        'citationItems': [ { "id" : sourceID }, ... ];
+        'citationItems': [ { "id" : sourceID, "locator": pincite, "prefix": explanatoryPrefix, "suffix": explanatorySuffix }, ... ];
 	'properties' : { 'noteIndex' : noteNumber },
 	'citationID' : clusterID
    }
