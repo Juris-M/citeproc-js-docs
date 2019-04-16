@@ -299,7 +299,7 @@ HTML output mode, with registered items "Item-1" and "Item-2").
          bibstart: "<div class=\"csl-bib-body\">\n",
          bibend: "</div>",
          bibliography_errors: [],
-         entry_ids: [\"Item-1\", \"Item-2\"]
+         entry_ids: [[\"Item-1\"], [\"Item-2\"]]
       },
       [
          "<div class=\"csl-entry\">Book A</div>",
